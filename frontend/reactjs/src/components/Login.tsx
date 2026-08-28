@@ -4,6 +4,8 @@ import SoftBackdrop from './SoftBackdrop'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const Login = () => {
   const [state, setState] = useState<"login" | "register" | "forgot" | "reset">("login")
   const {user, login, signUp} = useAuth()
@@ -57,7 +59,7 @@ const Login = () => {
         } 
         else if (state === "forgot") {
             try {
-            const res = await fetch("http://localhost:3000/api/auth/forgot-password", { // ← change port if needed
+            const res = await fetch(`${API_URL}/api/auth/forgot-password`, { // ← change port if needed
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email: formData.email }),
@@ -84,7 +86,7 @@ const Login = () => {
         } 
         else if (state === "reset") {
             try {
-            const res = await fetch("http://localhost:3000/api/auth/reset-password", { // ← change port if needed
+            const res = await fetch(`${API_URL}/api/auth/reset-password`, { // ← change port if needed
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -112,9 +114,9 @@ const Login = () => {
                 newPassword: ''
             });
 
-            } catch (error) {
+            } catch (error: any) {
             console.log(error);
-            alert("Something went wrong");
+            alert(error?.response?.data?.message || error.message || "Something went wrong");
             }
         }
     };
