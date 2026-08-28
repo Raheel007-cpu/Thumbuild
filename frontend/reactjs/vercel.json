@@ -1,9 +1,5 @@
-  {
+{
     "rewrites": [
-      {
-        "source": "/api/:path*",
-        "destination":"https://thumbuild-backend.vercel.app/"
-      },
       {
         "source": "/(.*)",
         "destination": "/"
