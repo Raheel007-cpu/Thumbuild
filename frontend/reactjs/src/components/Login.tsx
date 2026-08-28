@@ -3,8 +3,7 @@ import {useState} from 'react'
 import SoftBackdrop from './SoftBackdrop'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
-
-const API_URL = import.meta.env.VITE_API_URL;
+import api from '../configs/api'
 
 const Login = () => {
   const [state, setState] = useState<"login" | "register" | "forgot" | "reset">("login")
@@ -59,64 +58,39 @@ const Login = () => {
         } 
         else if (state === "forgot") {
             try {
-            const res = await fetch(`${API_URL}/api/auth/forgot-password`, { // ← change port if needed
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email: formData.email }),
-                credentials: "include"
-            });
+                const { data } = await api.post('/api/auth/forgot-password', {
+                    email: formData.email
+                });
 
-            const data = await res.json();
+                alert(`Your Reset Token is:\n\n${data.resetToken}\n\nCopy this token and paste it in the next step.`);
 
-            if (!res.ok) {
-                alert(data.message);
-                return;
-            }
-
-            // Show token for demo purpose
-            alert(`Your Reset Token is:\n\n${data.resetToken}\n\nCopy this token and paste it in the next step.`);
-            
-            setFormData(prev => ({ ...prev, resetToken: data.resetToken }));
-            setState("reset");
-
-            } catch (error) {
-            console.log(error);
-            alert("Something went wrong");
+                setFormData(prev => ({ ...prev, resetToken: data.resetToken }));
+                setState("reset");
+            } catch (error: any) {
+                console.log(error);
+                alert(error?.response?.data?.message || error.message || "Something went wrong");
             }
         } 
         else if (state === "reset") {
             try {
-            const res = await fetch(`${API_URL}/api/auth/reset-password`, { // ← change port if needed
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                email: formData.email,
-                resetToken: formData.resetToken,
-                newPassword: formData.newPassword
-                }),
-                credentials: "include"
-            });
+                const { data } = await api.post('/api/auth/reset-password', {
+                    email: formData.email,
+                    resetToken: formData.resetToken,
+                    newPassword: formData.newPassword
+                });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                alert(data.message);
-                return;
-            }
-
-            alert("Password reset successfully! Please login with your new password.");
-            setState("login");
-            setFormData({
-                name: '',
-                email: '',
-                password: '',
-                resetToken: '',
-                newPassword: ''
-            });
-
+                alert(data.message || "Password reset successfully! Please login with your new password.");
+                setState("login");
+                setFormData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    resetToken: '',
+                    newPassword: ''
+                });
             } catch (error: any) {
-            console.log(error);
-            alert(error?.response?.data?.message || error.message || "Something went wrong");
+                console.log(error);
+                alert(error?.response?.data?.message || error.message || "Something went wrong");
             }
         }
     };
