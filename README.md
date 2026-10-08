@@ -1,6 +1,6 @@
 # Thumbuild
 
-AI-powered Youtube Thumbnail Gnenerator
+AI-powered Youtube Thumbnail Generator
 
 **LIVE DEMO**: https://thumbuild-ff1i.vercel.app/
 
